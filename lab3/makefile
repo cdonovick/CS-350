@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -std=c99 -Wall -Wextra -pedantic -ggdb 
+CFLAGS=-c -std=gnu99 -Wall -Wextra -pedantic -O2 
 LDFLAGS=
 LIBFLAGS=-lpthread
 SOURCES=main.c
