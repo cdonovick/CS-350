@@ -54,11 +54,13 @@ struct queue_t {
     node_t *arr; /* should not be accessed */
     
     /* locked members */
+    uint8_t num_professors;
     node_t *free_head;
     node_t *used_head;
     node_t *used_tail;
 
     /* member locks */
+    pthread_mutex_t px;
     pthread_mutex_t fx;
     pthread_mutex_t ux;
 
@@ -78,6 +80,7 @@ struct node_t {
 typedef struct work_args {
     void *self;
     queue_t *q;
+    pthread_barrier_t *barrier;
 } work_args;
 
 /* function declarations */
@@ -88,11 +91,12 @@ void* professor_work(void *pargs);
 void printProf(professor_t *professor);
 
 void student_init(student_t *student);
-void* student_work(void *student);
+void* student_work(void *pargs);
 
 void queue_init(queue_t *queue, opt_struct *opts);
 void queue_destroy(queue_t *queue);
 void queue_produce(queue_t *queue, assignment_t *t);
-void queue_consume(queue_t *queue, student_t *student);
+bool queue_consume(queue_t *queue, student_t *student);
+
 #endif
 

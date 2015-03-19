@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-c -ggdb -std=c99 -Wall -Wextra -pedantic
+CFLAGS=-c -ggdb -std=gnu99 -Wall -Wextra -pedantic
 LDFLAGS=
 LIBFLAGS=-lpthread
 SOURCES=main.c util.c functions.c
