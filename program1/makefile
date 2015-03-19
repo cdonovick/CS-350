@@ -2,7 +2,7 @@ CC=clang
 CFLAGS=-c -ggdb -std=c99 -Wall -Wextra -pedantic
 LDFLAGS=
 LIBFLAGS=-lpthread
-SOURCES=main.c util.c
+SOURCES=main.c util.c functions.c
 OBJECTS=$(patsubst %.c, %.o, $(SOURCES))
 EXECUTABLE=program1
 	

@@ -1,6 +1,64 @@
 #include "standard.h"
 #include "util.h"
 
+void synch_fprintf(FILE *stream, const char *format, ...) {
+    static pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
+    va_list args;
+    va_start(args, format); 
+    pthread_mutex_lock(&mx);
+    vfprintf(stream, format, args);
+    pthread_mutex_unlock(&mx);
+    va_end(args);
+}
+
+#ifndef EC_FUNC
+#define EC_FUNC(lib, type, method,  ...) \
+    int error = lib##_##type##_##method(__VA_ARGS__); \
+    if (error) { \
+        fprintf(stderr, "Error: " #lib "_" #type "_" #method " failed\nError %i\n", error); \
+        exit(EXIT_FAILURE); \
+    }
+#endif
+
+void mutex_init(pthread_mutex_t *mx, const pthread_mutexattr_t *a) {
+    EC_FUNC(pthread, mutex, init, mx, a);
+}
+
+void mutex_destroy(pthread_mutex_t *mx) {
+    EC_FUNC(pthread, mutex, destroy, mx);
+}
+
+void mutex_lock(pthread_mutex_t *mx) {
+    EC_FUNC(pthread, mutex, lock, mx);
+}
+
+void mutex_unlock(pthread_mutex_t *mx) {
+    EC_FUNC(pthread, mutex, unlock, mx);
+}
+
+
+void cond_init(pthread_cond_t *c, const pthread_condattr_t *a) {
+    EC_FUNC(pthread, cond, init, c, a);
+}
+
+
+void cond_destroy(pthread_cond_t *c) {
+    EC_FUNC(pthread, cond, destroy, c);
+}
+
+
+void cond_wait(pthread_cond_t *c, pthread_mutex_t *m) {
+    EC_FUNC(pthread, cond, wait, c, m);
+}
+
+void cond_signal(pthread_cond_t *c) {
+    EC_FUNC(pthread, cond, signal, c);
+}
+
+void cond_broadcast(pthread_cond_t *c) {
+    EC_FUNC(pthread, cond, broadcast, c);
+}
+
 opt_struct opt_builder(int argc, char** argv) {
     /* macro magic to build OPT_STRING */
     static const char *OPT_STRING = ":"

@@ -2,6 +2,26 @@
 #define UTIL_H
 #include "standard.h"
 #include <getopt.h>
+#include <stdarg.h>
+
+/* wrapper functions */
+void synch_fprintf(FILE *stream, const char *format, ...); 
+
+void mutex_init(pthread_mutex_t *mx, const pthread_mutexattr_t *a);
+void mutex_destroy(pthread_mutex_t *mx);
+void mutex_lock(pthread_mutex_t *mx);
+void mutex_unlock(pthread_mutex_t *mx);
+
+void cond_init(pthread_cond_t *c, const pthread_condattr_t *a);
+void cond_destroy(pthread_cond_t *c);
+void cond_wait(pthread_cond_t *c, pthread_mutex_t *m);
+void cond_signal(pthread_cond_t *c);
+void cond_broadcast(pthread_cond_t *c);
+
+#ifndef RANDRANGE
+#define RANDRANGE(min, max) \
+    ((rand() % ((max) - (min) + 1)) + (min))
+#endif
 /*
  * ./program1 [-a <num_assignings>]
  * [-w <min_prof_wait>] [-W <max_prof_wait>]
@@ -71,10 +91,11 @@ typedef struct opt_struct {
 #undef X
 } opt_struct;
 
+/* opts functions */
 opt_struct opt_builder(int argc, char** argv);
 void usage(void);
 void missingArg(int arg);
 void unknownArg(int arg);
 void printOpts(opt_struct *opts);
-
 #endif
+
