@@ -1,6 +1,6 @@
 CC=clang
-CFLAGS=-c -ggdb -std=gnu99 -Wall -Wextra -pedantic
-LDFLAGS=
+CFLAGS=-c -O3 -std=gnu99 -Wall -Wextra -pedantic
+LDFLAGS=-s
 LIBFLAGS=-lpthread
 SOURCES=main.c util.c functions.c
 OBJECTS=$(patsubst %.c, %.o, $(SOURCES))

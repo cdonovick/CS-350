@@ -55,12 +55,13 @@ struct queue_t {
     
     /* locked members */
     uint8_t num_professors;
+    uint8_t num_students;
+    uint16_t count;
     node_t *free_head;
     node_t *used_head;
     node_t *used_tail;
 
     /* member locks */
-    pthread_mutex_t px;
     pthread_mutex_t fx;
     pthread_mutex_t ux;
 
