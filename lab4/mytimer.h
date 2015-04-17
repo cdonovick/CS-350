@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
+#include <pthread.h>
+
 #include <assert.h>
 #include <errno.h>
 
@@ -13,6 +15,7 @@ typedef struct timer {
     timer_status_t status;
     struct timeval *start;
     struct timeval *end;
+    pthread_mutex_t mx;
 } timer;
 
 
@@ -22,11 +25,11 @@ extern const char *timer_error_str[];
  * Returns a timer pointer or null 
  * if not null should be freed with freeTimer
  */
-extern timer * new_timer(void);
-extern void free_timer(timer *t);
-extern int timer_start(timer *t);
-extern int timer_stop(timer *t);
-extern int timer_getElasped(timer *t, struct timeval *elasped);
-
+ 
+timer * new_timer(void);
+void free_timer(timer *t);
+int timer_start(timer *t);
+int timer_stop(timer *t);
+int timer_getElasped(timer *t, struct timeval *elasped);
 #endif
 

@@ -50,6 +50,7 @@ timer * new_timer(void) {
         t->status = INIT;
         timer_errno = NO_ERROR;
     }
+    pthread_mutex_init(&(t->mx), NULL);
 
     return t;
 }
@@ -57,59 +58,74 @@ timer * new_timer(void) {
 void free_timer(timer *t) {
     free(t->start);
     free(t->end);
+    pthread_mutex_destroy(&(t->mx));
     free(t);
 }
 
 int timer_start(timer *t) {
+    pthread_mutex_lock(&(t->mx));
     if (gettimeofday(t->start, NULL)) {
         assert(errno == EPERM);
         timer_errno = PERM;
+        pthread_mutex_unlock(&(t->mx));
         return -1;
     } else {
         t->status = RUNNING; 
         timer_errno = NO_ERROR;
+        pthread_mutex_unlock(&(t->mx));
         return 0;
     }
 }
 
 int timer_stop(timer *t) {
+    pthread_mutex_lock(&(t->mx));
     if (t->status == INIT) {
         timer_errno = STOP_NO_START;
+        pthread_mutex_unlock(&(t->mx));
         return -1;
     } else if (t->status == STOPPED) {
         timer_errno = DOUBLE_STOP;
+        pthread_mutex_unlock(&(t->mx));
         return -1;
     } else if (gettimeofday(t->end, NULL)) {
         assert(errno == EPERM);
         timer_errno = PERM;
+        pthread_mutex_unlock(&(t->mx));
         return -1;
     } else {
         t->status = STOPPED; 
         timer_errno = NO_ERROR;
+        pthread_mutex_unlock(&(t->mx));
         return 0;
     }
 }
 
 int timer_getElasped(timer *t, struct timeval *elasped) {
+    pthread_mutex_lock(&(t->mx));
     if (elasped == NULL) {
         timer_errno = NPE;
+        pthread_mutex_unlock(&(t->mx));
         return -1;
     } else if (t->status == INIT) {
         timer_errno = GET_NO_START;
+        pthread_mutex_unlock(&(t->mx));
         return -1;
     } else if (t->status == STOPPED) {
         elasped->tv_sec = t->end->tv_sec - t->start->tv_sec;
         elasped->tv_usec = t->end->tv_usec - t->start->tv_usec;
+        pthread_mutex_unlock(&(t->mx));
         return 0;
     } else {
         struct timeval now;
         if (gettimeofday(&now, NULL)) {
             assert(errno == EPERM);
             timer_errno = PERM;
+            pthread_mutex_unlock(&(t->mx));
             return -1;
         }
         elasped->tv_sec = now.tv_sec - t->start->tv_sec;
         elasped->tv_usec = now.tv_usec - t->start->tv_usec;
+        pthread_mutex_unlock(&(t->mx));
         return 0;
     }
 }
